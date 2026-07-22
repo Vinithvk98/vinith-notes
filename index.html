@@ -39,6 +39,8 @@
   .navlinks{display:flex;gap:24px}
   .navlinks a{color:var(--mute);text-decoration:none;font-size:13.5px}
   .navlinks a:hover{color:var(--ink)}
+  .navlinks a.port{color:var(--indigo);font-weight:600}
+  .navlinks a.port:hover{color:var(--plum)}
   @media(max-width:640px){.navlinks{display:none}}
 
   .wrap{max-width:720px;margin:0 auto;padding:0 24px}
@@ -140,6 +142,7 @@
     <a href="#walmart">Walmart</a>
     <a href="#money">Money</a>
     <a href="#projects">Code</a>
+    <a class="port" href="https://vinithkportfolio.netlify.app/" target="_blank" rel="noopener">Portfolio ↗</a>
   </div>
 </nav>
 
@@ -169,6 +172,7 @@
   <div class="eyebrow reveal">Project one</div>
   <h2 class="reveal">SKU Sentinel — watching the watchman</h2>
   <p class="reveal">SKU Sentinel monitors a fleet of demand forecasts the way an SRE monitors servers. Every week it checks each product against reality, is accuracy inside this product's own calibrated tolerance, is there sustained bias, has the error distribution shifted, are the actuals frozen or zeroed or suddenly ten times larger, which usually means a broken pipeline rather than a demand miracle.</p>
+  <p class="reveal">A quick word on what is actually doing the predicting. Each product gets its own forecasting model, a ridge regression trained on calendar and promotion features in log space, kept deliberately simple and frozen after training so I could study how a real model ages in production. The monitor itself is model-agnostic, it only needs the forecast and the actual, so it would work just as happily on top of a gradient-boosted or deep-learning forecaster. To test that claim I also built a small bench of eight forecasting models, from a seasonal naive baseline through Holt-Winters, Random Forest, Gradient Boosting, XGBoost and LightGBM, up to a PyTorch LSTM, and raced them on the same data. The drift detection then leans on classic statistics, the Population Stability Index, a Kolmogorov-Smirnov test, and a Page-Hinkley sequential change detector.</p>
   <p class="reveal">Because I built the test data myself, I could inject 28 known problems at known dates and grade the monitor honestly, not by intuition.</p>
 
   <div class="stats reveal">
@@ -183,7 +187,7 @@
 
   <div class="eyebrow reveal" id="walmart">The reality check</div>
   <h2 class="reveal">Then I tested it on Walmart</h2>
-  <p class="reveal">Synthetic success is easy. So I ran the identical engine on the M5 dataset: two years of real daily sales for the top 300 food products at one Walmart store in California, under three forecasting regimes. The bars show the share of products the monitor flagged. Lower is better.</p>
+  <p class="reveal">Synthetic success is easy. So I ran the identical engine on the M5 dataset, which holds two years of real daily sales for the top 300 food products at one Walmart store in California, under three forecasting regimes. The bars show the share of products the monitor flagged. Lower is better.</p>
 
   <div class="race reveal" id="race">
     <div class="cap">// share of 300 products flagged, by forecasting regime</div>
@@ -192,12 +196,12 @@
     <div class="row"><span>+ Real drivers</span><div class="track"><div class="fill f3" data-w="86"></div></div><span>65.3%</span></div>
   </div>
 
-  <p class="reveal">That progression rewrote my assumptions. I expected retraining to fix most of it. It fixed about eight points. The dominant diagnosis across all three regimes was sustained <strong>bias</strong>, which is the statistical signature of a <em>missing driver</em>, not of staleness. Real demand moves for reasons a calendar cannot see, and no retraining schedule compensates for a variable the model was never given. The M5 competition reached the same conclusion by another road: its winners all needed price and event features plus heavy models.</p>
+  <p class="reveal">That progression rewrote my assumptions. I expected retraining to fix most of it. It fixed about eight points. The dominant diagnosis across all three regimes was sustained <strong>bias</strong>, which is the statistical signature of a <em>missing driver</em>, not of staleness. Real demand moves for reasons a calendar cannot see, and no retraining schedule compensates for a variable the model was never given. The M5 competition reached the same conclusion by another road, since its winners all needed price and event features plus heavy models.</p>
   <p class="reveal">Meanwhile the data-quality checks caught <strong>33 genuine anomalies</strong> in real Walmart history, stockouts and discontinuations and holiday closures, with identical counts in all three regimes, because those checks test the data rather than the model. A good monitor does not just say something is wrong. It tells you <em>which</em> thing is wrong, because fixing a pipeline and retraining a model are very different Tuesdays.</p>
 
   <div class="eyebrow reveal" id="money">Project two</div>
   <h2 class="reveal">NextMove — forecasts are opinions, orders are money</h2>
-  <p class="reveal">A forecast on a dashboard changes nothing. So the second project converts forecasts and their uncertainty into order quantities using newsvendor economics: for each product, what does a missed sale cost, and what does a leftover unit cost, including the risk that it spoils.</p>
+  <p class="reveal">A forecast on a dashboard changes nothing. So the second project converts forecasts and their uncertainty into order quantities using newsvendor economics. For each product it weighs two costs, what a missed sale burns in lost margin, and what a leftover unit costs to hold or to throw away when it spoils.</p>
 
   <div class="stats reveal">
     <div class="stat"><div class="n" data-to="100" data-prefix="+$" data-suffix="k">+$0k</div><div class="l">profit vs trusting the point forecast</div></div>
@@ -205,7 +209,7 @@
     <div class="stat"><div class="n" data-to="0" data-suffix="">0</div><div class="l">service levels hand-tuned by me</div></div>
   </div>
 
-  <p class="reveal">The part I find most satisfying: nobody set the service levels. Detergent earned a 99% target because leftovers cost pennies. Yogurt ran lean because leftovers rot. The economics decided, product by product. And there is a compounding insight hiding in it: better forecasts narrow the uncertainty, which shrinks safety stock automatically. Forecast accuracy converts directly into working capital, but only if the decision layer actually consumes the uncertainty instead of admiring it.</p>
+  <p class="reveal">The part I find most satisfying is that nobody set the service levels. Detergent earned a 99% target because leftovers cost pennies. Yogurt ran lean because leftovers rot. The economics decided, product by product. And there is a compounding insight hiding in it. Better forecasts narrow the uncertainty, which shrinks safety stock automatically. Forecast accuracy converts directly into working capital, but only if the decision layer actually consumes the uncertainty instead of admiring it.</p>
 
   <div class="rule reveal"></div>
 
