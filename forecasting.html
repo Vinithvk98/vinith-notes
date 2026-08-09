@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Vinith Kumar · A support agent that knows when to hand off</title>
-<meta name="description" content="SupportIQ is an agentic AI support agent built on LangGraph. It answers what it can prove and hands the risky cases to a human, measured against the bot most companies ship.">
-<meta property="og:title" content="The smartest thing a support bot can do is know when to stop">
-<meta property="og:description" content="An agentic support agent with a real human in the loop, measured against a plain chatbot.">
+<title>Vinith Kumar — Notes on trusting forecasts</title>
+<meta name="description" content="Building statistical governance for demand forecasts. Two open-source projects, measured on real Walmart data.">
+<meta property="og:title" content="What 300 Walmart products taught me about trusting forecasts">
+<meta property="og:description" content="Two open-source projects on forecast monitoring and prescriptive ordering, measured against real data.">
 <meta property="og:type" content="article">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -17,7 +17,7 @@
     --line:#e7e1d4; --indigo:#4f46e5; --plum:#7c3aed; --coral:#ea580c; --teal:#0f766e;
     --serif:"Fraunces",Georgia,serif; --sans:"Inter",system-ui,sans-serif; --mono:"JetBrains Mono",monospace;
   }
-  *{box-sizing:border-box;margin:0;padding:0}
+  *{box-sizing:border-box;margin:0;padding:0}  
   html{scroll-behavior:smooth}
   body{background:var(--bg);color:var(--body);font-family:var(--sans);line-height:1.75;
        -webkit-font-smoothing:antialiased;overflow-x:hidden}
@@ -45,6 +45,7 @@
 
   .wrap{max-width:720px;margin:0 auto;padding:0 24px}
 
+  /* hero */
   header.hero{max-width:940px;margin:0 auto;padding:150px 24px 70px;position:relative}
   .kicker{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;
           letter-spacing:2px;color:var(--indigo);text-transform:uppercase;
@@ -137,98 +138,105 @@
 <nav id="nav">
   <a class="brand" href="index.html"><span class="dot"></span>VINITH&nbsp;/&nbsp;NOTES</a>
   <div class="navlinks">
-    <a href="#problem">The 30%</a>
-    <a href="#build">What I built</a>
-    <a href="#human">The human</a>
-    <a href="#benchmark">The proof</a>
+    <a href="#spark">The spark</a>
+    <a href="#walmart">Walmart</a>
+    <a href="#money">Money</a>
     <a href="index.html">← All notes</a>
     <a class="port" href="https://vinithkportfolio.netlify.app/" target="_blank" rel="noopener">Portfolio ↗</a>
   </div>
 </nav>
 
 <header class="hero" id="top">
-  <div class="kicker"><span class="dot"></span>Agentic AI · LangGraph · Human in the loop</div>
-  <h1 class="title">The smartest thing a support bot can do is <span class="em">know when to stop.</span></h1>
-  <p class="lede">I built a support agent that answers what it can prove and hands everything risky to a human before it is sent. Then I measured it against the bot most companies actually ship. Here is what I built, and where the real gap is.</p>
+  <div class="kicker"><span class="dot"></span>Forecasting · MLOps · Decision Intelligence</div>
+  <h1 class="title">The most dangerous forecast is the one that <span class="em">used to be right.</span></h1>
+  <p class="lede">I spent a few months building two open-source systems to watch forecasts drift and turn them into decisions, then tested them on 300 real Walmart products. Here is what I built, and what the data taught me.</p>
   <div class="byline">
     <span class="av">V</span>
-    <span>Vinith Kumar&nbsp;&nbsp;·&nbsp;&nbsp;Dublin&nbsp;&nbsp;·&nbsp;&nbsp;8 min read</span>
+    <span>Vinith Kumar&nbsp;&nbsp;·&nbsp;&nbsp;Dublin&nbsp;&nbsp;·&nbsp;&nbsp;12 min read</span>
   </div>
   <div class="scrollcue"><span class="ln"></span>SCROLL TO READ</div>
 </header>
 
 <article class="wrap">
 
-  <p class="reveal drop"><span class="lead">Answering "how do I reset my password" is a solved problem.</span> Point a language model at a help center, and it will handle the easy seventy percent of support tickets all day long. That part is not interesting anymore, and it is not where companies get hurt.</p>
+  <p class="reveal drop"><span class="lead">A model gets trained, it performs well, everyone moves on.</span> Then the world shifts. A supplier changes prices, a data pipeline silently breaks, customer behavior drifts. The model keeps producing confident numbers, and the business keeps acting on them. Nobody notices, because nobody is watching the watchman.</p>
 
-  <p class="reveal">They get hurt on the other thirty percent. A customer asks for a refund, and a plain chatbot cheerfully explains the refund and sends it, no human anywhere. Someone types "delete my account and erase my data," and the bot actions the intent. A question lands that the docs simply do not cover, and the model, rather than admit it, invents a policy that sounds right. These are the expensive, trust destroying mistakes, and they are the reason most companies still keep humans on the front line instead of turning the AI fully on.</p>
+  <p class="reveal">This is the unglamorous half of machine learning. Everyone wants to build the model. Almost nobody wants to babysit it. But an unwatched model is a liability with a nice dashboard.</p>
 
-  <p class="reveal">So I wanted to build the part everyone skips. Not another chatbot that answers, but the layer that decides whether the AI is even allowed to answer, and pulls a human in at exactly the right moment. I called it SupportIQ.</p>
+  <div class="eyebrow reveal" id="spark">The spark</div>
+  <h2 class="reveal">A vision worth building toward</h2>
+  <p class="reveal">For a while now I have been following the work of Graphite Note and its founder, Hrvoje Smolić. What pulled me in was the clarity of the mission to democratize decision intelligence, so that any business, not just the ones with a data-science department, can predict outcomes, understand what drives them, test actions, and choose the next best move.</p>
+  <p class="reveal">One idea from his writing kept circling in my head. Prediction alone is not enough, and causal inference alone is not enough either, the future belongs to systems that close the loop between insight and action. And before you can <em>govern</em> automated decisions, you first have to <em>build</em> the intelligence underneath them. Tolerance bands. Drift monitoring. Exception handling for the models themselves. Statistical governance comes before decision governance.</p>
+  <p class="reveal">It is a compelling way to see the field, and I wanted to do more than admire it from the outside. So rather than just read about the problem, I set myself a challenge to build a working piece of that vision, end to end, and measure it honestly. Two projects came out of it.</p>
 
-  <div class="eyebrow reveal" id="problem">The premise</div>
-  <h2 class="reveal">Knowing when not to answer is the product</h2>
-  <p class="reveal">The interesting question in support automation is not "can it answer," it is "does it know the limits of what it should decide alone." A system you can trust in front of customers has to do three things. Answer the safe, grounded questions instantly. Refuse to guess when the knowledge base cannot support a reply. And on anything sensitive, stop and let a person approve the message before it goes out.</p>
-  <p class="reveal">That last behaviour, the human in the loop, is the one every demo waves at and almost none implement for real. A fake pause is easy. A pause that survives, that holds a half-finished conversation on a shelf until a human comes back minutes later and finishes it, is a genuine engineering problem. That is the part I wanted to get right.</p>
-
-  <div class="eyebrow reveal" id="build">What I built</div>
-  <h2 class="reveal">SupportIQ, a state machine with a conscience</h2>
-  <p class="reveal">Under the hood SupportIQ is not a prompt with a few if-statements, it is a <strong>LangGraph</strong> state machine. Every customer message flows through the same graph: retrieve from the knowledge base, grade the situation, then branch to one of three outcomes.</p>
-  <p class="reveal"><strong>Answer.</strong> Safe questions with a clear, grounded reply are answered on the spot, in plain language, with the sources kept on file. <strong>Human review.</strong> Anything sensitive, refunds, cancellations, security, data deletion, is drafted but not sent, it goes to an agent desk where a person approves, edits, or escalates it. <strong>Escalate.</strong> If retrieval is weak, or an answerability check finds the retrieved text does not actually cover the question, it hands off to a human instead of guessing.</p>
-  <p class="reveal">The grade step is where the judgement lives. It reads three signals: how confident retrieval is, whether the retrieved passage genuinely covers the question, and whether the topic is on a sensitivity list that always requires a human. That middle signal mattered more than I expected. Keyword search will happily rank the pricing page highly for a question about next year's stock price, because they share the word <em>price</em>. An answerability gate, checking that the passage really addresses what was asked, is what stops a confident but irrelevant answer from ever being drafted.</p>
-
-  <div class="eyebrow reveal" id="human">The hard part</div>
-  <h2 class="reveal">The human in the loop is real, not a prop</h2>
-  <p class="reveal">When a ticket needs review, the graph does not fake a wait. It hits a real LangGraph <strong>interrupt</strong>, checkpoints the entire run, and stops. The draft, the sources, and the reason it was held all sit in the review queue. Later, a human on the agent desk clicks approve, edit, or escalate, and the very same conversation resumes from exactly where it paused, in a completely separate request. Proving that one flow, a paused run picked up and finished later, was the piece I was most careful about, because it is the difference between a demo and something you could actually put in front of customers.</p>
-  <p class="reveal">Every answer the agent does send is grounded. It only states what a retrieved source supports, and a faithfulness check flags any reply that drifts beyond the evidence. The customer sees clean prose, the agent desk keeps the citations, which is exactly where each belongs.</p>
-
-  <div class="eyebrow reveal" id="benchmark">The reality check</div>
-  <h2 class="reveal">Then I measured it against a plain bot</h2>
-  <p class="reveal">A claim like "safer" is worthless without a number. So I built a benchmark of 33 labelled questions across a 15-document knowledge base, and ran SupportIQ against the thing you get when you wire retrieval straight to a chat box, an answer-everything bot with no routing and no human. Both were scored on the same questions.</p>
+  <div class="eyebrow reveal">Project one</div>
+  <h2 class="reveal">SKU Sentinel — watching the watchman</h2>
+  <p class="reveal">SKU Sentinel monitors a fleet of demand forecasts the way an SRE monitors servers. Every week it checks each product against reality, is accuracy inside this product's own calibrated tolerance, is there sustained bias, has the error distribution shifted, are the actuals frozen or zeroed or suddenly ten times larger, which usually means a broken pipeline rather than a demand miracle.</p>
+  <p class="reveal">A quick word on what is actually doing the predicting. Each product gets its own forecasting model, a ridge regression trained on calendar and promotion features in log space, kept deliberately simple and frozen after training so I could study how a real model ages in production. The monitor itself is model-agnostic, it only needs the forecast and the actual, so it would work just as happily on top of a gradient-boosted or deep-learning forecaster. To test that claim I also built a small bench of eight forecasting models, from a seasonal naive baseline through Holt-Winters, Random Forest, Gradient Boosting, XGBoost and LightGBM, up to a PyTorch LSTM, and raced them on the same data. The drift detection then leans on classic statistics, the Population Stability Index, a Kolmogorov-Smirnov test, and a Page-Hinkley sequential change detector.</p>
+  <p class="reveal">Because I built the test data myself, I could inject 28 known problems at known dates and grade the monitor honestly, not by intuition.</p>
 
   <div class="stats reveal">
-    <div class="stat"><div class="n" data-to="100" data-suffix="%">0%</div><div class="l">questions routed correctly · the plain bot managed 64%</div></div>
-    <div class="stat"><div class="n" data-to="100" data-suffix="%">0%</div><div class="l">replies grounded in a real source</div></div>
-    <div class="stat"><div class="n" data-to="100" data-suffix="%">0%</div><div class="l">off-topic questions escalated, not guessed</div></div>
+    <div class="stat"><div class="n" data-to="86" data-suffix="%">0%</div><div class="l">of injected drift events caught</div></div>
+    <div class="stat"><div class="n" data-to="83" data-suffix="%">0%</div><div class="l">of alarms were real problems</div></div>
+    <div class="stat"><div class="n" data-to="5" data-suffix="">0</div><div class="l">false alarms · 200 SKUs · 6 months</div></div>
   </div>
 
-  <p class="reveal">On the safe questions, the two tie, as they should. The whole gap is in the cases that cost money and trust. There were seven genuinely sensitive requests in the set, refunds, cancellations, a security report, an account deletion. The plain bot auto-sent an answer to every single one, with no human in the loop. SupportIQ held all seven.</p>
+  <p class="reveal">One lesson cost me an evening of confusion and taught me the most. The textbook alarm threshold for PSI, a standard drift statistic, is 0.25. On small monitoring windows, the expected value of PSI when there is <em>no drift at all</em> is already around 0.4. Textbook settings had my monitor flagging almost everything.</p>
+
+  <div class="pull reveal">Correcting one threshold for finite samples took false alarms from roughly 170 down to 5. Alert fatigue is how monitoring systems die.</div>
+
+  <div class="eyebrow reveal" id="walmart">The reality check</div>
+  <h2 class="reveal">Then I tested it on Walmart</h2>
+  <p class="reveal">Synthetic success is easy. So I ran the identical engine on the M5 dataset, which holds two years of real daily sales for the top 300 food products at one Walmart store in California, under three forecasting regimes. The bars show the share of products the monitor flagged. Lower is better.</p>
 
   <div class="race reveal" id="race">
-    <div class="cap">// sensitive requests sent to a customer with no human review, out of 7</div>
-    <div class="row"><span>Plain bot</span><div class="track"><div class="fill f2" data-w="100"></div></div><span>7 / 7</span></div>
-    <div class="row"><span>SupportIQ</span><div class="track"><div class="fill f3" data-w="3"></div></div><span>0 / 7</span></div>
+    <div class="cap">// share of 300 products flagged, by forecasting regime</div>
+    <div class="row"><span>Frozen model</span><div class="track"><div class="fill f1" data-w="100"></div></div><span>75.7%</span></div>
+    <div class="row"><span>+ Retrained</span><div class="track"><div class="fill f2" data-w="89"></div></div><span>67.3%</span></div>
+    <div class="row"><span>+ Real drivers</span><div class="track"><div class="fill f3" data-w="86"></div></div><span>65.3%</span></div>
   </div>
 
-  <div class="pull reveal">Zero unsafe auto-sends against seven. That single line is the whole argument for a human in the loop, made in numbers instead of adjectives.</div>
+  <p class="reveal">That progression rewrote my assumptions. I expected retraining to fix most of it. It fixed about eight points. The dominant diagnosis across all three regimes was sustained <strong>bias</strong>, which is the statistical signature of a <em>missing driver</em>, not of staleness. Real demand moves for reasons a calendar cannot see, and no retraining schedule compensates for a variable the model was never given. The M5 competition reached the same conclusion by another road, since its winners all needed price and event features plus heavy models.</p>
+  <p class="reveal">Meanwhile the data-quality checks caught <strong>33 genuine anomalies</strong> in real Walmart history, stockouts and discontinuations and holiday closures, with identical counts in all three regimes, because those checks test the data rather than the model. A good monitor does not just say something is wrong. It tells you <em>which</em> thing is wrong, because fixing a pipeline and retraining a model are very different Tuesdays.</p>
 
-  <p class="reveal">On the questions the knowledge base could not support, the plain bot invented an answer every time, and SupportIQ escalated every time. Same model of the world, opposite instincts. The reliability does not come from a smarter language model, it comes from the graph around it: the routing, the grounding, and the permission to say "I need a person for this."</p>
+  <div class="eyebrow reveal" id="money">Project two</div>
+  <h2 class="reveal">NextMove — forecasts are opinions, orders are money</h2>
+  <p class="reveal">A forecast on a dashboard changes nothing. So the second project converts forecasts and their uncertainty into order quantities using newsvendor economics. For each product it weighs two costs, what a missed sale burns in lost margin, and what a leftover unit costs to hold or to throw away when it spoils.</p>
+
+  <div class="stats reveal">
+    <div class="stat"><div class="n" data-to="100" data-prefix="+$" data-suffix="k">+$0k</div><div class="l">profit vs trusting the point forecast</div></div>
+    <div class="stat"><div class="n" data-to="4.5" data-suffix="×" data-dec="1">0×</div><div class="l">less spoilage than the textbook rule</div></div>
+    <div class="stat"><div class="n" data-to="0" data-suffix="">0</div><div class="l">service levels hand-tuned by me</div></div>
+  </div>
+
+  <p class="reveal">The part I find most satisfying is that nobody set the service levels. Detergent earned a 99% target because leftovers cost pennies. Yogurt ran lean because leftovers rot. The economics decided, product by product. And there is a compounding insight hiding in it. Better forecasts narrow the uncertainty, which shrinks safety stock automatically. Forecast accuracy converts directly into working capital, but only if the decision layer actually consumes the uncertainty instead of admiring it.</p>
 
   <div class="rule reveal"></div>
 
   <div class="eyebrow reveal">What I took away</div>
   <h2 class="reveal">Three things I believe now</h2>
-  <p class="reveal"><strong>Refusing is a feature, not a failure.</strong> The most valuable thing an agent can learn is the edge of its own competence, so I scored refusal directly instead of hoping for it. <strong>A human in the loop has to be real.</strong> If the pause does not survive across requests, it is theatre, and LangGraph's checkpointed interrupts are what make it honest. And <strong>measure against the bot you would actually ship,</strong> not a strawman. The naive answer-everything baseline is what a rushed team deploys, and beating it on the cases that matter is the only comparison a stakeholder cares about.</p>
+  <p class="reveal"><strong>Measure your own detector.</strong> A monitoring system that has never been graded against ground truth is folklore with a confidence interval. <strong>Respect alert fatigue.</strong> A precise alarm stream a team trusts beats a sensitive one they learn to ignore. And <strong>uncertainty is not a footnote.</strong> Handled honestly, it is the most valuable number in the pipeline.</p>
 
-  <div class="eyebrow reveal" id="code">The code</div>
-  <h2 class="reveal">It is open source</h2>
-  <p class="reveal">The full agent, the streaming console, the agent desk, and the reproducible benchmark are all in the repo. It runs offline with no key, or on a local model, or on OpenAI, with one environment variable.</p>
+  <div class="eyebrow reveal" id="projects">The code</div>
+  <h2 class="reveal">Both are open source</h2>
+  <p class="reveal">Full write-ups, reproducible experiments, honest limitations, and web consoles you can run in a minute.</p>
 
   <div class="cards reveal">
-    <a class="card" href="https://github.com/Vinithvk98/supportiq" target="_blank" rel="noopener">
-      <div class="tag">AGENTIC AI · GOVERN</div>
-      <h4>SupportIQ</h4>
-      <p>A LangGraph support agent with a real human in the loop. 100% routing, zero unsafe auto-sends against seven, measured versus a plain bot.</p>
+    <a class="card" href="https://github.com/Vinithvk98/sku-sentinel" target="_blank" rel="noopener">
+      <div class="tag">MONITOR · GOVERN</div>
+      <h4>SKU Sentinel</h4>
+      <p>Drift and data-quality monitoring for forecast fleets. 86% recall, validated on M5 Walmart data across three regimes.</p>
       <span class="go">View on GitHub →</span>
     </a>
-    <a class="card" href="index.html">
-      <div class="tag">FORECASTING · MLOPS</div>
-      <h4>The forecasting notes</h4>
-      <p>My earlier write-up on watching forecasts drift and turning them into orders, measured on 300 real Walmart products.</p>
-      <span class="go">Read the essay →</span>
+    <a class="card" href="https://github.com/Vinithvk98/nextmove" target="_blank" rel="noopener">
+      <div class="tag">PRESCRIBE · DECIDE</div>
+      <h4>NextMove</h4>
+      <p>Prescriptive ordering with newsvendor economics. +$100k profit vs naive policies in a backtested P&amp;L.</p>
+      <span class="go">View on GitHub →</span>
     </a>
   </div>
 
-  <p class="reveal">If you work on agents, support automation, or applied AI governance, I would genuinely value your critique. I am always happy to talk shop, and always building toward something you can actually trust.</p>
+  <p class="reveal">If you work in forecasting, supply chain, or decision intelligence, I would genuinely value your critique. I am always happy to talk shop, and always building toward the next move.</p>
 
 </article>
 
