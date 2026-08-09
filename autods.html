@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vinith Kumar · A model that scores 99 percent usually cheated</title>
+<meta name="description" content="AutoDS Copilot is a no-code AI data-science assistant. It runs the whole ML workflow from a spreadsheet, and the real engineering was making it honest.">
+<meta property="og:title" content="A model that scores 99 percent usually cheated">
+<meta property="og:description" content="Building a no-code data-science copilot that automates the workflow and refuses to cheat, with LangGraph, RAG, and MCP.">
+<meta property="og:type" content="article">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#f6f3ec; --paper:#fffdf8; --ink:#1b1b23; --body:#3a3a45; --mute:#767683; --dim:#a1a1ab;
+    --line:#e7e1d4; --indigo:#4f46e5; --plum:#7c3aed; --coral:#ea580c; --teal:#0f766e;
+    --serif:"Fraunces",Georgia,serif; --sans:"Inter",system-ui,sans-serif; --mono:"JetBrains Mono",monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--body);font-family:var(--sans);line-height:1.75;
+       -webkit-font-smoothing:antialiased;overflow-x:hidden}
+  ::selection{background:var(--indigo);color:#fff}
+  #bar{position:fixed;top:0;left:0;height:3px;width:0;z-index:99;
+       background:linear-gradient(90deg,var(--indigo),var(--coral))}
+  nav{position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;
+      justify-content:space-between;padding:16px 30px;
+      backdrop-filter:blur(10px);background:rgba(246,243,236,.72);border-bottom:1px solid transparent;
+      transition:border-color .3s}
+  nav.scrolled{border-color:var(--line)}
+  .brand{font-family:var(--mono);font-size:13px;letter-spacing:2px;color:var(--ink);text-decoration:none;
+         display:flex;gap:9px;align-items:center;font-weight:600}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--coral);
+       box-shadow:0 0 0 0 rgba(234,88,12,.5);animation:pulse 2.4s ease-out infinite}
+  @keyframes pulse{70%{box-shadow:0 0 0 9px rgba(234,88,12,0)}100%{box-shadow:0 0 0 0 rgba(234,88,12,0)}}
+  .navlinks{display:flex;gap:24px}
+  .navlinks a{color:var(--mute);text-decoration:none;font-size:13.5px}
+  .navlinks a:hover{color:var(--ink)}
+  .navlinks a.port{color:var(--indigo);font-weight:600}
+  .navlinks a.port:hover{color:var(--plum)}
+  @media(max-width:640px){.navlinks{display:none}}
+  .wrap{max-width:720px;margin:0 auto;padding:0 24px}
+  header.hero{max-width:940px;margin:0 auto;padding:150px 24px 70px;position:relative}
+  .kicker{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:12px;
+          letter-spacing:2px;color:var(--indigo);text-transform:uppercase;
+          background:#eee9ff;border:1px solid #ddd5ff;padding:7px 16px;border-radius:99px;margin-bottom:30px}
+  h1.title{font-family:var(--serif);font-weight:900;font-size:clamp(42px,7.5vw,82px);line-height:1.03;
+           letter-spacing:-1.5px;color:var(--ink)}
+  h1.title .em{font-style:italic;font-weight:500;color:var(--coral)}
+  .lede{font-size:20px;color:var(--mute);margin-top:28px;max-width:62ch}
+  .byline{display:flex;gap:14px;align-items:center;margin-top:36px;font-size:13.5px;color:var(--mute);
+          font-family:var(--mono)}
+  .byline .av{width:38px;height:38px;border-radius:50%;
+              background:linear-gradient(135deg,var(--indigo),var(--plum));display:grid;place-items:center;
+              color:#fff;font-weight:600;font-family:var(--sans)}
+  .scrollcue{margin-top:56px;color:var(--dim);font-family:var(--mono);font-size:11px;letter-spacing:2px;
+             display:flex;align-items:center;gap:8px}
+  .scrollcue .ln{width:40px;height:1px;background:var(--dim)}
+  article{padding:30px 0 10px}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:2px;color:var(--coral);
+           text-transform:uppercase;margin:66px 0 12px;display:flex;align-items:center;gap:12px}
+  .eyebrow::before{content:"";width:26px;height:2px;background:var(--coral)}
+  h2{font-family:var(--serif);font-weight:600;font-size:clamp(28px,5vw,40px);line-height:1.12;
+     letter-spacing:-.5px;margin:12px 0 8px;color:var(--ink)}
+  h3{font-family:var(--serif);font-weight:600;font-size:23px;margin:42px 0 6px;color:var(--ink)}
+  p{font-size:18px;color:var(--body);margin:18px 0}
+  p .lead{font-size:20px}
+  strong{color:var(--ink);font-weight:600}
+  a.link{color:var(--indigo);text-decoration:none;border-bottom:1px solid rgba(79,70,229,.3)}
+  a.link:hover{border-color:var(--indigo)}
+  .drop::first-letter{font-family:var(--serif);font-size:76px;font-weight:900;float:left;line-height:.78;
+                      padding:8px 14px 0 0;color:var(--indigo)}
+  .pull{font-family:var(--serif);font-style:italic;font-size:27px;line-height:1.4;color:var(--ink);
+        border-left:3px solid var(--coral);padding:8px 0 8px 26px;margin:44px 0}
+  .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin:42px 0;
+         background:var(--paper);border:1px solid var(--line);border-radius:18px;overflow:hidden;
+         box-shadow:0 20px 50px -30px rgba(27,27,35,.25)}
+  .stat{padding:28px 22px;border-right:1px solid var(--line)}
+  .stat:last-child{border-right:0}
+  .stat .n{font-family:var(--serif);font-weight:900;font-size:42px;color:var(--indigo);line-height:1}
+  .stat .l{font-size:12.5px;color:var(--mute);margin-top:8px}
+  @media(max-width:560px){.stats{grid-template-columns:1fr}
+    .stat{border-right:0;border-bottom:1px solid var(--line)}.stat:last-child{border-bottom:0}}
+  code{font-family:var(--mono);font-size:15px;background:#efe9dc;padding:2px 7px;border-radius:6px;
+       color:var(--plum)}
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:40px 0}
+  @media(max-width:600px){.cards{grid-template-columns:1fr}}
+  .card{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:26px;
+        text-decoration:none;color:inherit;transition:transform .18s,box-shadow .18s,border-color .18s;display:block}
+  .card:hover{transform:translateY(-4px);border-color:var(--indigo);
+              box-shadow:0 24px 50px -28px rgba(79,70,229,.4)}
+  .card .tag{font-family:var(--mono);font-size:11px;letter-spacing:1.5px;color:var(--dim)}
+  .card h4{font-family:var(--serif);font-size:22px;font-weight:600;margin:8px 0 6px;color:var(--ink)}
+  .card p{font-size:14px;color:var(--mute);margin:6px 0 14px}
+  .card .go{font-family:var(--mono);font-size:13px;color:var(--indigo)}
+  .rule{height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent);margin:62px 0}
+  footer{background:var(--ink);color:#e9e9ef;margin-top:84px;padding:64px 24px}
+  .fwrap{max-width:720px;margin:0 auto}
+  footer h3{font-family:var(--serif);font-size:27px;margin:0 0 10px;color:#fff}
+  footer p{font-size:16px;color:#a6a6b3}
+  .social{display:flex;gap:12px;margin-top:24px;flex-wrap:wrap}
+  .social a{font-family:var(--mono);font-size:13px;color:#e9e9ef;text-decoration:none;
+            border:1px solid #33333f;padding:9px 16px;border-radius:99px;transition:.18s}
+  .social a:hover{border-color:var(--coral);color:#fff}
+  .fine{margin-top:34px;font-size:12.5px;color:#6a6a77;font-family:var(--mono)}
+  .reveal{opacity:0;transform:translateY(22px);transition:opacity .7s,transform .7s}
+  .reveal.in{opacity:1;transform:none}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+
+<nav id="nav">
+  <a class="brand" href="index.html"><span class="dot"></span>VINITH&nbsp;/&nbsp;NOTES</a>
+  <div class="navlinks">
+    <a href="#grind">The grind</a>
+    <a href="#honest">The honest part</a>
+    <a href="#agents">The agent</a>
+    <a href="#rag">The memory</a>
+    <a href="supportiq.html">SupportIQ</a>
+    <a class="port" href="https://vinithkportfolio.netlify.app/" target="_blank" rel="noopener">Portfolio ↗</a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="kicker"><span class="dot"></span>AutoML · Agents · RAG · MCP</div>
+  <h1 class="title">A model that scores 99 percent usually <span class="em">cheated.</span></h1>
+  <p class="lede">I built a no-code tool that takes a raw spreadsheet and runs the whole
+    machine-learning workflow on its own, exploring, cleaning, comparing dozens of models,
+    training the best one, and writing up the result. The interesting engineering was not
+    the automation. It was making it honest.</p>
+  <div class="byline">
+    <span class="av">V</span>
+    <span>Vinith Kumar&nbsp;&nbsp;·&nbsp;&nbsp;Dublin&nbsp;&nbsp;·&nbsp;&nbsp;9 min read</span>
+  </div>
+  <div class="scrollcue"><span class="ln"></span>SCROLL TO READ</div>
+</header>
+
+<article class="wrap">
+
+  <p class="reveal drop"><span class="lead">Most of data science is not the model.</span> It
+    is the grind before it, loading a messy file, fixing how it is represented, charting it,
+    deciding what kind of problem it even is, choosing an algorithm, and checking the result
+    is real. Everyone wants to build the model. Almost nobody wants the grind. So I built a
+    tool that does the grind, and explains the answer to someone who is not an ML engineer.</p>
+
+  <p class="reveal">AutoDS Copilot takes a spreadsheet and walks the entire workflow, pre-clean,
+    explore, quality checks, task detection, cleaning, a model leaderboard, training,
+    evaluation, tuning, a written analysis, an interactive dashboard, and prediction on new
+    data. It runs locally, and it needs no API key. But automating the steps was the easy
+    part. The part worth writing about is trust.</p>
+
+  <div class="eyebrow reveal" id="grind">The architecture</div>
+  <h2 class="reveal">One engine, three front doors</h2>
+  <p class="reveal">All of the machine-learning logic lives in one place, a modular
+    scikit-learn pipeline where every stage is a plain, testable function. Three thin
+    interfaces drive that same engine. A web console you click through. A command-line agent
+    that runs the pipeline as cooperating steps. And a set of tools any AI client can call.
+    Nothing is duplicated, so the same capability shows up in a browser, a terminal, and an
+    AI assistant without writing it three times.</p>
+  <p class="reveal">That separation is the spine of the project. The interfaces are thin, the
+    engine is where the care goes.</p>
+
+  <div class="eyebrow reveal" id="honest">The honest part</div>
+  <h2 class="reveal">A high score is a suspect, not a trophy</h2>
+  <p class="reveal">Here is the failure mode that ruins real projects. A model scores
+    ninety-nine percent, everyone celebrates, and it turns out a column in the data quietly
+    contained the answer, or an ID column let the model memorise rows instead of learning.
+    That is data leakage, and it is the single most common way a machine-learning result is
+    a lie.</p>
+  <p class="reveal">AutoDS is built against it on two fronts. First, correctness by
+    construction, every bit of preprocessing, the imputing, scaling, and encoding, lives
+    inside a scikit-learn Pipeline that is fit only on the training split, never on the whole
+    dataset, so information from the test set cannot leak backward into training. Second, it
+    audits the data before it models, flagging columns that move almost perfectly with the
+    target, constant columns, ID-like columns, and duplicates, and it pre-selects the risky
+    ones to drop.</p>
+
+  <div class="pull reveal">A tool that can hit ninety-nine percent and cannot tell you why is
+    not a feature, it is a liability. Catching the cheat is the difference between a real
+    result and a fake one.</div>
+
+  <div class="stats reveal">
+    <div class="stat"><div class="n" data-to="36" data-suffix="">0</div><div class="l">models cross-validated on your data, 32 built in</div></div>
+    <div class="stat"><div class="n" data-to="3" data-suffix="">0</div><div class="l">front doors driving one engine</div></div>
+    <div class="stat"><div class="n" data-to="0" data-suffix="">0</div><div class="l">preprocessing fit on the test set, by design</div></div>
+  </div>
+
+  <div class="eyebrow reveal" id="agents">The agent</div>
+  <h2 class="reveal">Specialised steps, and a human at the gates</h2>
+  <p class="reveal">The command-line version is a LangGraph state machine. Each stage is a
+    node, a loader, a profiler, an EDA step, a task detector, a cleaner, a model recommender,
+    a trainer, an evaluator, and an insight writer, with a typed state threaded through all of
+    them. At two points, cleaning and model choice, the graph stops and hands control back to
+    a person. It uses a real interrupt that checkpoints the run and resumes exactly where it
+    paused once the human decides.</p>
+  <p class="reveal">The hardest bug in the whole project was not machine learning at all. The
+    checkpointer serialises the state so a run can pause and continue, but a pandas DataFrame
+    and a fitted model are not serialisable. My first version broke the moment it tried to
+    save. The fix was to keep those heavy objects in an in-memory store keyed by a run id, and
+    let the graph state carry only that lightweight id. The state stays serialisable, and the
+    pause and resume work. It is a small idea that took real debugging to find, and it is the
+    part I am most quietly proud of.</p>
+
+  <div class="eyebrow reveal" id="rag">The memory</div>
+  <h2 class="reveal">Advice that is grounded, and that learns from use</h2>
+  <p class="reveal">The tool does not narrate from thin air. A small knowledge base of
+    data-science guidance is retrieved to ground the written insights, with the source named,
+    so the advice it gives is backed by real material rather than invented. That is ordinary
+    retrieval augmented generation.</p>
+  <p class="reveal">The piece I like more is the memory. Every run is saved with a numeric
+    fingerprint of the dataset, its size, shape, missingness, imbalance, and task. When a new
+    dataset arrives, the tool retrieves the most similar past runs and recommends by analogy.
+    The more it is used, the better its suggestions get, because it actually remembers what
+    happened before. And everything is grounded and works offline, the language-model step is
+    optional and only polishes the wording.</p>
+
+  <div class="eyebrow reveal">The three doors</div>
+  <h2 class="reveal">A browser, a terminal, and an AI assistant</h2>
+  <p class="reveal">The same engine is exposed as a Flask web console with a live pipeline and
+    an interactive dashboard, as the LangGraph agent you run from the command line, and as a
+    Model Context Protocol server with nine tools, packaged as an installable plugin. That
+    last one means you can drop it into an AI client like Claude Desktop and run the whole
+    pipeline by chatting, profile a dataset, detect the task, run the leaderboard, train and
+    evaluate, all as tool calls. One engine, three ways to reach it.</p>
+
+  <div class="rule reveal"></div>
+
+  <div class="eyebrow reveal">What I took away</div>
+  <h2 class="reveal">Three things I believe now</h2>
+  <p class="reveal"><strong>Automation is the easy half.</strong> Wiring the steps together
+    took a week, making the result trustworthy took the rest of the project. <strong>Leakage
+    is the real enemy.</strong> A number you cannot explain is a number you cannot use, so
+    the guardrails that hunt for a cheat matter more than any single model. And <strong>ground
+    the words.</strong> The moment a tool starts explaining itself, every sentence should trace
+    back to the data or to retrieved guidance, never to a confident guess.</p>
+
+  <div class="eyebrow reveal" id="code">The code</div>
+  <h2 class="reveal">It is open source</h2>
+  <p class="reveal">The full engine, the web console, the agent, the MCP plugin, and an offline
+    test suite are all in the repo, with a written report you can generate in a minute on the
+    bundled sample data.</p>
+
+  <div class="cards reveal">
+    <a class="card" href="https://github.com/Vinithvk98/AutoDS-Copilot" target="_blank" rel="noopener">
+      <div class="tag">AUTOML · AGENTS · MCP</div>
+      <h4>AutoDS Copilot</h4>
+      <p>A no-code data-science copilot. One scikit-learn engine behind a web console, a
+        LangGraph agent, and an MCP plugin, built to refuse to cheat.</p>
+      <span class="go">View on GitHub →</span>
+    </a>
+    <a class="card" href="supportiq.html">
+      <div class="tag">AGENTIC AI · GOVERN</div>
+      <h4>SupportIQ</h4>
+      <p>A support agent with a real human in the loop, measured against a plain bot on the
+        cases that cost money and trust.</p>
+      <span class="go">Read the post →</span>
+    </a>
+  </div>
+
+  <p class="reveal">If you work on applied machine learning, AutoML, or trustworthy AI, I would
+    genuinely value your critique. I am always happy to talk shop, and always building toward
+    something you can actually trust.</p>
+
+</article>
+
+<footer>
+  <div class="fwrap">
+    <h3>Vinith Kumar</h3>
+    <p>Python and AI (Machine-Learning) engineer in Dublin, building systems that turn predictions into decisions companies can act on.</p>
+    <div class="social">
+      <a href="https://www.linkedin.com/in/vinith-kumar-g-p/" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://github.com/Vinithvk98" target="_blank" rel="noopener">GitHub</a>
+      <a href="mailto:vinithvkk050@gmail.com">Email</a>
+    </div>
+    <div class="fine">© 2026 Vinith Kumar · Written by Vinith · Built with passion and zeal</div>
+  </div>
+</footer>
+
+<script>
+  const bar=document.getElementById('bar'), nav=document.getElementById('nav');
+  addEventListener('scroll',()=>{
+    const h=document.documentElement, sc=h.scrollTop/(h.scrollHeight-h.clientHeight);
+    bar.style.width=(sc*100)+'%';
+    nav.classList.toggle('scrolled',h.scrollTop>40);
+  });
+  const io=new IntersectionObserver((es)=>es.forEach(e=>{
+    if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}
+  }),{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+  function animate(el){
+    const to=parseFloat(el.dataset.to), dec=parseInt(el.dataset.dec||0),
+          pre=el.dataset.prefix||'', suf=el.dataset.suffix||'', t0=performance.now(), dur=1400;
+    function tick(t){
+      const p=Math.min((t-t0)/dur,1), e=1-Math.pow(1-p,3), v=(to*e).toFixed(dec);
+      el.textContent=pre+v+suf;
+      if(p<1)requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+  const cio=new IntersectionObserver((es)=>es.forEach(e=>{
+    if(e.isIntersecting){animate(e.target);cio.unobserve(e.target);}
+  }),{threshold:.6});
+  document.querySelectorAll('.stat .n').forEach(el=>cio.observe(el));
+</script>
+</body>
+</html>
