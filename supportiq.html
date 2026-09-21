@@ -37,7 +37,7 @@
        box-shadow:0 0 0 0 rgba(234,88,12,.5);animation:pulse 2.4s ease-out infinite}
   @keyframes pulse{70%{box-shadow:0 0 0 9px rgba(234,88,12,0)}100%{box-shadow:0 0 0 0 rgba(234,88,12,0)}}
   .navlinks{display:flex;gap:24px}
-  .navlinks a{color:var(--mute);text-decoration:none;font-size:13.5px}
+  .navlinks a{color:var(--mute);text-decoration:none;font-family:var(--mono);font-size:12px;letter-spacing:.5px}
   .navlinks a:hover{color:var(--ink)}
   .navlinks a.port{color:var(--indigo);font-weight:600}
   .navlinks a.port:hover{color:var(--plum)}
@@ -129,6 +129,26 @@
 
   .reveal{opacity:0;transform:translateY(22px);transition:opacity .7s,transform .7s}
   .reveal.in{opacity:1;transform:none}
+
+  /* trace-flow console */
+  .sysblock{max-width:940px;margin:8px auto 0;padding:0 24px}
+  .system{position:relative;display:flex;flex-direction:column;padding:30px 28px;border-radius:18px;background:radial-gradient(ellipse at var(--mx,60%) var(--my,45%),#2a2440 0%,#1b1712 68%);color:#efe9dd;overflow:hidden;box-shadow:0 30px 60px -34px rgba(27,27,35,.5)}
+  .system:before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:26px 26px;pointer-events:none}
+  .system:after{content:'';position:absolute;top:0;left:0;width:95px;height:3px;background:var(--coral)}
+  .system>*{position:relative}
+  .system-head{display:flex;justify-content:space-between;gap:12px;font-family:var(--mono);font-size:9px;letter-spacing:.8px;text-transform:uppercase;color:#b3aca0}
+  .flow{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;flex:1;min-height:150px;padding:16px 0}
+  .node{border:1px solid #3f3a4d;background:#221d2c;color:#c3bcae;padding:16px 12px;text-align:center;min-width:96px;transition:.35s;font-family:var(--mono);font-size:10px;line-height:1.6}
+  .node .step{display:block;font-size:9px;color:#9c968a;margin-bottom:8px}
+  .node .node-label{font-size:12px;color:#e7e0d3}
+  .node.active{border-color:#a5a0f5;color:#fff;background:var(--indigo);transform:translateY(-5px);box-shadow:0 12px 30px rgba(79,70,229,.3)}
+  .wire{position:relative;width:46px;height:1px;background:#4a4436}
+  .packet{position:absolute;top:-2px;left:0;width:5px;height:5px;background:var(--coral);opacity:0}
+  .system-foot{border-top:1px solid #3a352c;margin-top:8px;padding-top:16px;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+  .trace-status{font-family:var(--mono);font-size:10px;color:#b3aca0}
+  .trace{border:1px solid #4a4436;background:#241f18;color:#f2eee4;font-family:var(--mono);font-size:10px;padding:9px 12px;cursor:pointer;transition:.2s;border-radius:4px}
+  .trace:hover{background:#2e281f}
+  @media(max-width:520px){.node{min-width:80px;padding:12px 8px}.wire{width:22px}}
 </style>
 </head>
 <body>
@@ -156,6 +176,21 @@
   </div>
   <div class="scrollcue"><span class="ln"></span>SCROLL TO READ</div>
 </header>
+
+<section class="sysblock reveal">
+  <div class="system">
+    <div class="system-head"><span>System perspective</span><span>Conceptual flow</span></div>
+    <div class="flow">
+        <div class="node"><span class="step">01 / INPUT</span><span class="node-label">Question</span></div>
+        <div class="wire"><span class="packet"></span></div>
+        <div class="node"><span class="step">02 / PROCESS</span><span class="node-label">Evidence</span></div>
+        <div class="wire"><span class="packet"></span></div>
+        <div class="node"><span class="step">03 / OUTPUT</span><span class="node-label">Review</span></div>
+    </div>
+    <div class="system-foot"><span class="trace-status">Follow the decision path.</span><button class="trace">Trace flow ↗</button></div>
+  </div>
+</section>
+
 
 <article class="wrap">
 
@@ -241,7 +276,7 @@
       <a href="https://github.com/Vinithvk98" target="_blank" rel="noopener">GitHub</a>
       <a href="mailto:vinithvkk050@gmail.com">Email</a>
     </div>
-    <div class="fine">© 2026 Vinith Kumar · Written by Vinith · Built with passion and zeal</div>
+    <div class="fine">Written by Vinith · Built with passion and zeal</div>
   </div>
 </footer>
 
@@ -280,6 +315,25 @@
     }
   }),{threshold:.4});
   const race=document.getElementById('race'); if(race)rio.observe(race);
+</script>
+
+<script>
+(()=>{
+ const reduce=matchMedia('(prefers-reduced-motion: reduce)');
+ const steps=["Start with the support question.", "Ground the response in evidence.", "Identify the need for human review."];
+ const nodes=[...document.querySelectorAll('.node')],packets=[...document.querySelectorAll('.packet')],
+   trace=document.querySelector('.trace'),status=document.querySelector('.trace-status'),system=document.querySelector('.system');
+ if(!trace)return;
+ let run=0;
+ function reset(){run++;nodes.forEach(n=>n.classList.remove('active'));packets.forEach(p=>p.getAnimations().forEach(a=>a.cancel()));trace.disabled=false;status.textContent='Follow the decision path.';}
+ async function traceFlow(){reset();const token=run;trace.disabled=true;const pause=ms=>new Promise(r=>setTimeout(r,ms));
+   for(let i=0;i<nodes.length;i++){if(token!==run)return;nodes.forEach((n,j)=>n.classList.toggle('active',j===i));status.textContent=steps[i];
+     if(i<nodes.length-1){await pause(reduce.matches?250:520);if(token!==run)return;if(!reduce.matches){const pk=packets[i],w=pk.parentElement.clientWidth;await pk.animate([{transform:'translateX(0)',opacity:1},{transform:'translateX('+w+'px)',opacity:1}],{duration:500,easing:'ease-in-out'}).finished.catch(()=>{});}else await pause(250);}}
+   if(token===run)trace.disabled=false;}
+ trace.addEventListener('click',traceFlow);
+ if(!reduce.matches){system.addEventListener('pointermove',e=>{if(e.pointerType==='touch')return;const r=system.getBoundingClientRect();system.style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');system.style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%');});system.addEventListener('pointerleave',()=>{system.style.removeProperty('--mx');system.style.removeProperty('--my');});}
+ if(!reduce.matches){const so=new IntersectionObserver(es=>{if(es.some(e=>e.isIntersecting)){so.disconnect();traceFlow();}},{threshold:.5});so.observe(system);}
+})();
 </script>
 </body>
 </html>
