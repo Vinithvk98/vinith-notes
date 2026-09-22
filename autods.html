@@ -134,8 +134,9 @@
 <nav id="nav">
   <a class="brand" href="index.html"><span class="dot"></span>VINITH&nbsp;/&nbsp;NOTES</a>
   <div class="navlinks">
-    <a href="#grind">The grind</a>
     <a href="#honest">The honest part</a>
+    <a href="#copilot">The copilot</a>
+    <a href="#rigor">The rare class</a>
     <a href="#agents">The agent</a>
     <a href="#rag">The memory</a>
     <a href="index.html">← All notes</a>
@@ -149,10 +150,12 @@
   <p class="lede">I built a no-code tool that takes a raw spreadsheet and runs the whole
     machine-learning workflow on its own, exploring, cleaning, comparing dozens of models,
     training the best one, and writing up the result. The interesting engineering was not
-    the automation. It was making it honest.</p>
+    the automation. It was making it honest. Since then it has grown a grounded AI copilot
+    that answers questions from your real data, and an agent that can plan a whole run for
+    you to approve.</p>
   <div class="byline">
     <span class="av">V</span>
-    <span>Vinith Kumar&nbsp;&nbsp;·&nbsp;&nbsp;Dublin&nbsp;&nbsp;·&nbsp;&nbsp;9 min read</span>
+    <span>Vinith Kumar&nbsp;&nbsp;·&nbsp;&nbsp;Dublin&nbsp;&nbsp;·&nbsp;&nbsp;12 min read</span>
   </div>
   <div class="scrollcue"><span class="ln"></span>SCROLL TO READ</div>
 </header>
@@ -222,6 +225,40 @@
     <div class="stat"><div class="n" data-to="0" data-suffix="">0</div><div class="l">preprocessing fit on the test set, by design</div></div>
   </div>
 
+  <div class="eyebrow reveal" id="copilot">The copilot</div>
+  <h2 class="reveal">A copilot that reads your data, not just the docs</h2>
+  <p class="reveal">The first version could answer questions from a small knowledge base. The new
+    one answers from your actual rows. Ask it the churn rate by plan and it does not guess. It
+    routes the question to a safe, whitelisted analysis, runs it on your data, and shows the
+    numbers it used. The words are written by a language model, but every figure is real, and the
+    answer streams as it is written so you are never left staring at a spinner.</p>
+  <p class="reveal">It never runs free code. It picks one of a fixed set of vetted operations, a
+    grouped rate, a distribution, a correlation, checks the columns against your data, and only
+    then computes. So it is a copilot you can hand the file to, not a chatbot guessing at it. And
+    when no model is configured it falls back to plain rule based text, so the tool always works,
+    online or off.</p>
+
+  <div class="eyebrow reveal" id="rigor">The rare class</div>
+  <h2 class="reveal">Handling a lopsided problem without fooling yourself</h2>
+  <p class="reveal">Most real problems are uneven. Churn is a small slice, fraud is a smaller one.
+    A model can score high and stay useless by always predicting the common case. AutoDS now
+    rebalances the training data when a class is rare, and it shows you the counts before and
+    after on a step of its own, so the fix is something you can see rather than take on faith.</p>
+  <p class="reveal">The whole point is where it happens. The data is split first, and only the
+    training half is rebalanced. The test half keeps its real ratio, so the score you read is
+    honest and nothing leaks. It also tunes the decision threshold, which on the sample lifted the
+    F1 for the rare class from about 0.26 to 0.37, checks how well the predicted probabilities are
+    calibrated, and reports whether the error rate is uneven across groups.</p>
+
+  <div class="eyebrow reveal" id="explain">Showing its work</div>
+  <h2 class="reveal">A number nobody understands is one nobody will act on</h2>
+  <p class="reveal">So the tool explains itself. It measures which of your original columns the
+    model truly leans on by shuffling each one and watching the score fall, a method that works
+    for any model and not only for trees, and it names real columns like tenure and support calls
+    rather than encoded feature codes. It points to where the model makes its mistakes, broken
+    down by group, so you know where to be careful. And it writes a short summary of the whole
+    run for the person who will never read a table of metrics.</p>
+
   <div class="eyebrow reveal" id="agents">The agent</div>
   <h2 class="reveal">Specialised steps, and a human at the gates</h2>
   <p class="reveal">The command-line version is a LangGraph state machine. Each stage is a
@@ -237,6 +274,18 @@
     let the graph state carry only that lightweight id. The state stays serialisable, and the
     pause and resume work. It is a small idea that took real debugging to find, and it is the
     part I am most quietly proud of.</p>
+
+  <div class="eyebrow reveal" id="autopilot">The auto-pilot</div>
+  <h2 class="reveal">An agent that plans the whole run, and still asks</h2>
+  <p class="reveal">The steps were always yours to approve. Now you can hand the wheel to the
+    copilot and still keep it. Ask it to run the dataset and it cross validates the candidate
+    models, picks the one that measures best for your data rather than a favourite, and lays out
+    a full plan, what to predict, what to drop, and which model, each with a reason. Nothing runs
+    until you approve it.</p>
+  <p class="reveal">On the churn sample the honest answer was not the fashionable one. Gradient
+    boosting is the usual winner, but a naive Bayes model scored higher here, and the agent said
+    so, with the number to back it. An agent that can tell you the boring model won is worth more
+    than one that always reaches for the same trick.</p>
 
   <div class="eyebrow reveal" id="rag">The memory</div>
   <h2 class="reveal">Advice that is grounded, and that learns from use</h2>

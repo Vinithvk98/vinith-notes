@@ -124,7 +124,7 @@ footer .fine{margin-top:34px;font-size:12.5px;color:#6a6a77;font-family:var(--mo
         <div class="feature-copy">
           <span class="mono feature-label">01 / AutoDS Copilot / AutoML</span>
           <h2 class="feature-title">Automate the workflow. Keep the evaluation visible.</h2>
-          <p class="feature-desc">One scikit learn engine behind three interfaces, a web console, a LangGraph agent, and an MCP plugin, built to stay honest about its results.</p>
+          <p class="feature-desc">One scikit learn engine behind a web console, a LangGraph agent, and an MCP plugin, now with a grounded AI copilot that reads your data and an agent that plans the run.</p>
           <button class="read">Read the write up <span class="arrow">→</span></button>
         </div>
         <div class="system">
@@ -147,7 +147,7 @@ footer .fine{margin-top:34px;font-size:12.5px;color:#6a6a77;font-family:var(--mo
       <a class="card reveal" href="autods.html" data-project="0">
         <div class="tag">AUTOML · AGENTS · MCP</div>
         <h4>AutoDS Copilot</h4>
-        <p>A no code data science copilot that runs the whole ML workflow from a spreadsheet and refuses to cheat.</p>
+        <p>A no code data science copilot. It runs the whole ML workflow from a spreadsheet, answers questions from your real data, and cross validates the models to pick the honest winner.</p>
         <span class="go">Read the post →</span>
       </a>
       <a class="card reveal" href="supportiq.html" data-project="1">
@@ -198,7 +198,7 @@ document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
 (()=>{
  const reduce=matchMedia('(prefers-reduced-motion: reduce)');
  const projects=[
-  {label:'01 / AutoDS Copilot / AutoML',title:'Automate the workflow. Keep the evaluation visible.',desc:'One scikit learn engine behind three interfaces, a web console, a LangGraph agent, and an MCP plugin, built to stay honest about its results.',nodes:['Dataset','Workflow','Evaluation'],steps:['Begin with the dataset.','Apply the shared ML workflow.','Inspect how the result is evaluated.'],url:'autods.html'},
+  {label:'01 / AutoDS Copilot / AutoML',title:'Automate the workflow. Keep the evaluation visible.',desc:'One scikit learn engine behind a web console, a LangGraph agent, and an MCP plugin, now with a grounded AI copilot that reads your data and an agent that plans the run.',nodes:['Dataset','Workflow','Evaluation'],steps:['Begin with the dataset.','Apply the shared ML workflow.','Inspect how the result is evaluated.'],url:'autods.html'},
   {label:'02 / SupportIQ / Agentic AI',title:'Where should the autonomy of an agent end?',desc:'Grounding support answers in evidence and defining when a human needs to take over before anything is sent.',nodes:['Question','Evidence','Review'],steps:['Start with the support question.','Ground the response in evidence.','Identify the need for human review.'],url:'supportiq.html'},
   {label:'03 / SKU Sentinel / Forecasting',title:'A forecast is a starting point, not a decision.',desc:'SKU Sentinel and NextMove connect demand forecasts, drift monitoring, and inventory planning.',nodes:['Forecast','Monitor','Plan'],steps:['Start with a demand forecast.','Watch for changes in behaviour.','Connect predictions to inventory decisions.'],url:'forecasting.html'}
  ];
